@@ -43,6 +43,18 @@ Alíquota de IR aplicável: 25%
 ![Balance growth simulation](balance_growth.png)
 ![Regressive income tax curve](ir_regressive_curve.png)
 
+## Interactive frontend
+
+A Streamlit app (`streamlit_app.py`) provides a live interface over the same
+calculation logic: adjustable inputs for salary, UR value, contribution
+percentage, service time, age, return rate and projection horizon, with
+results (contribution split, eligibility, portability, tax bracket, balance
+projection chart) updating immediately.
+
+```bash
+streamlit run streamlit_app.py
+```
+
 ## Scope and limitations
 
 This is an educational/portfolio project, not a production actuarial tool.
