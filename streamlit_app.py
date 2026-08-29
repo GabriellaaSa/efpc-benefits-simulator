@@ -14,7 +14,10 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 from efpc_calculator import (
+    apply_annual_adjustment,
     calculate_contribution,
+    calculate_peculio,
+    check_bpd_eligibility,
     check_eligibility,
     check_portability,
     income_tax_rate,
@@ -63,6 +66,35 @@ status_labels = {
 st.write(status_labels[eligibility["status"]])
 st.write("✅ Portabilidade liberada" if portable else "⏳ Portabilidade ainda não liberada (mínimo 3 anos)")
 st.write(f"Alíquota de IR aplicável (tabela regressiva): **{ir_rate:.0%}**")
+
+bpd = check_bpd_eligibility(years_of_service)
+if bpd["eligible_bpd"]:
+    st.write("✅ Elegível para BPD (Benefício Proporcional Diferido)")
+else:
+    st.write(
+        f"⏳ BPD ainda não liberado (faltam {bpd['years_short']:.1f} ano(s) "
+        f"de vínculo)"
+    )
+
+with st.expander("Pecúlio e reajuste anual (institutos adicionais)"):
+    peculio_multiplier = st.slider(
+        "Múltiplo do salário para pecúlio", min_value=1, max_value=48, value=24
+    )
+    peculio = calculate_peculio(salary, peculio_multiplier)
+    st.write(f"Pecúlio ilustrativo (morte/invalidez): **R$ {peculio:,.2f}**")
+
+    st.divider()
+    adjustment_index = st.slider(
+        "Índice de reajuste anual (%) — ex.: IPC-FGV", min_value=0.0, max_value=15.0, value=4.5, step=0.1
+    ) / 100
+    adjustment_years = st.number_input("Anos de reajuste acumulado", min_value=1, max_value=30, value=1)
+    adjusted_value = apply_annual_adjustment(
+        contribution.total_contribution, adjustment_index, adjustment_years
+    )
+    st.write(
+        f"Contribuição total corrigida após {adjustment_years} ano(s): "
+        f"**R$ {adjusted_value:,.2f}**"
+    )
 
 st.subheader("Projeção de saldo acumulado")
 balances = simulate_balance_growth(

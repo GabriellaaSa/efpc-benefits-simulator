@@ -1,5 +1,7 @@
 # EFPC Benefits Simulator
 
+[![Tests](https://github.com/GabriellaaSa/efpc-benefits-simulator/actions/workflows/tests.yml/badge.svg)](https://github.com/GabriellaaSa/efpc-benefits-simulator/actions/workflows/tests.yml)
+
 Calculation utilities and a small simulation for closed complementary pension
 funds (**EFPC** – Entidade Fechada de Previdência Complementar), the Brazilian
 equivalent of a corporate closed pension fund, regulated by **PREVIC** under
@@ -26,6 +28,14 @@ withdrawals, and a long-horizon balance growth simulation.
   from 35% down to 10% as the contribution matures past 10 years.
 - **Balance growth simulation** – monthly compounding of contributions over
   a working career, given a fixed annual return assumption.
+- **BPD (Benefício Proporcional Diferido)** – eligibility check for leaving
+  the accumulated balance in the plan after ending employment, to be
+  collected later as a deferred benefit.
+- **Pecúlio** – illustrative single lump-sum payout on death/invalidity,
+  modeled as a configurable multiple of salary.
+- **Annual adjustment** – compounding correction of a benefit value by an
+  index rate (e.g. IPC-FGV, used for annual readjustment in plans like
+  Valiaprev).
 
 ## Example output
 
@@ -54,6 +64,11 @@ projection chart) updating immediately.
 ```bash
 streamlit run streamlit_app.py
 ```
+
+## CI
+
+Every push and pull request to `main` runs the test suite via GitHub Actions
+(see `.github/workflows/tests.yml`).
 
 ## Scope and limitations
 

@@ -124,6 +124,57 @@ def check_portability(years_of_service: float, minimum_years: float = 3) -> bool
     return years_of_service >= minimum_years
 
 
+def check_bpd_eligibility(years_of_service: float, minimum_years: float = 3) -> dict:
+    """
+    Checks eligibility for BPD (Benefício Proporcional Diferido): a participant
+    who leaves the sponsoring company before retirement age can leave their
+    accumulated balance in the plan and collect it later as a deferred
+    benefit, instead of an immediate resgate or portability.
+
+    Uses the same minimum vesting period as portability by default, since
+    both institutos share the same underlying vesting logic in most CD/CV
+    plans - only what the participant chooses to do with the balance differs.
+    """
+    eligible = years_of_service >= minimum_years
+    return {
+        "eligible_bpd": eligible,
+        "minimum_years_required": minimum_years,
+        "years_short": max(0.0, round(minimum_years - years_of_service, 2)),
+    }
+
+
+def calculate_peculio(
+    salary: float, salary_multiplier: float = 24
+) -> float:
+    """
+    Illustrative pecúlio (single lump-sum payment on death or invalidity)
+    calculation, modeled as a configurable multiple of salary - a common
+    structure across EFPC plans, though the exact multiplier is defined per
+    plan regulation and not modeled here in detail (see README scope notes).
+
+    Args:
+        salary: gross monthly salary (BRL).
+        salary_multiplier: number of salaries paid as pecúlio (plan-specific;
+            24x is used here as an illustrative default).
+    """
+    return round(salary * salary_multiplier, 2)
+
+
+def apply_annual_adjustment(
+    value: float, index_rate: float, years: int = 1
+) -> float:
+    """
+    Applies a compounding annual adjustment to a benefit value - e.g. the
+    IPC-FGV index used for annual readjustment in plans like Valiaprev.
+
+    Args:
+        value: the benefit value before adjustment.
+        index_rate: annual adjustment rate as a decimal (e.g. 0.045 for 4.5%).
+        years: number of annual adjustments to apply (default 1).
+    """
+    return round(value * (1 + index_rate) ** years, 2)
+
+
 def simulate_balance_growth(
     salary: float,
     participant_percentage: float,
